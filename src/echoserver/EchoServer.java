@@ -1,5 +1,6 @@
 package echoserver;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,16 +15,37 @@ public class EchoServer {
 		server.start();
 	}
 
+	private class ProccessClientThread implements Runnable{
+	    InputStream inputStream;
+	    OutputStream outputStream;
+
+	    public ProccessClientThread(Socket socket) {
+	        try {
+                this.inputStream = socket.getInputStream();
+                this.outputStream = socket.getOutputStream();
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
+
+        public void run() {
+            int b;
+            try {
+                while ((b = inputStream.read()) != -1) {
+                    outputStream.write(b);
+                }
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
+    }
+
 	private void start() throws IOException, InterruptedException {
-		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-		while (true) {
-			Socket socket = serverSocket.accept();
-			InputStream inputStream = socket.getInputStream();
-			OutputStream outputStream = socket.getOutputStream();
-			int b;
-			while ((b = inputStream.read()) != -1) {
-				outputStream.write(b);
-			}
+        ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
+        while (true) {
+            Socket socket = serverSocket.accept();
+            Thread clientThread = new Thread(new ProccessClientThread(socket));
+            clientThread.start();
 		}
 	}
 }
