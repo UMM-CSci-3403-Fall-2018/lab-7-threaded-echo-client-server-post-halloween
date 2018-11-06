@@ -69,13 +69,12 @@ public class EchoClient{
 		inputThread.start();
 
 		outputThread.join();
-		socket.shutdownOutput();
+        socket.shutdownOutput();
 
 
         inputThread.join();
-
-
         System.out.flush();
+        socket.shutdownInput();
 
     }
 }

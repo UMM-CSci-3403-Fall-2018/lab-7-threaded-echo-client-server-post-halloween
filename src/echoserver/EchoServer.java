@@ -16,11 +16,13 @@ public class EchoServer {
 	}
 
 	private class ProccessClientThread implements Runnable{
+	    Socket socket;
 	    InputStream inputStream;
 	    OutputStream outputStream;
 
 	    public ProccessClientThread(Socket socket) {
 	        try {
+	            this.socket = socket;
                 this.inputStream = socket.getInputStream();
                 this.outputStream = socket.getOutputStream();
             } catch (IOException e) {
@@ -34,6 +36,8 @@ public class EchoServer {
                 while ((b = inputStream.read()) != -1) {
                     outputStream.write(b);
                 }
+                outputStream.flush();
+                socket.shutdownOutput();
             } catch (IOException e) {
                 System.out.println(e);
             }
